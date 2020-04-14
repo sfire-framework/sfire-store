@@ -1,0 +1,29 @@
+{
+    "name": "sfire-framework/sfire-store",
+    "description": "Singleton containers for storing arbitrary data keeping the state until the end of the run.",
+    "keywords": [
+        "sfire",
+        "container",
+        "state",
+        "store",
+        "singleton"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Kris Kuiper",
+            "email": "kris@sfire.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "sFire\\Store\\": "./src/"
+        }
+    }
+}
