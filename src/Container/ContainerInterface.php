@@ -14,7 +14,7 @@ namespace sFire\Store\Container;
 
 /**
  * Interface ContainerInterface
- * @package sFire\Container
+ * @package sFire\Store
  */
 interface ContainerInterface {
 

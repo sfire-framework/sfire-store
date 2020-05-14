@@ -57,7 +57,10 @@ abstract class ContainerAbstract implements ContainerInterface {
     public function __construct() {
 
         $this -> prefix = get_class($this);
-        static::$data[$this -> prefix] = [];
+
+        if(false === isset(static::$data[$this -> prefix])) {
+            static::$data[$this -> prefix] = [];
+        }
     }
 
 
@@ -69,7 +72,7 @@ abstract class ContainerAbstract implements ContainerInterface {
 
         $class = get_called_class();
 
-        if(false  === isset(self::$instances[$class])) {
+        if(false === isset(self::$instances[$class])) {
             self::$instances[$class] = new $class();
         }
 
@@ -83,8 +86,8 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @param mixed $value
      * @return void
      */
-    public function set($key, $value): void {
-        $this -> getTranslator(gettype($key)) -> set(static::$data[$this -> prefix], $key, $value);
+    public function set($key, $value = null): void {
+        $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> set($key, $value);
     }
 
 
@@ -95,7 +98,7 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @return void
      */
     public function add($key, $value) {
-        return $this -> getTranslator(gettype($key)) -> add(static::$data[$this -> prefix], $key, $value);
+        $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> add($key, $value);
     }
 
 
@@ -105,7 +108,7 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @return bool
      */
     public function has($key): bool {
-        return $this -> getTranslator(gettype($key)) -> has(static::$data[$this -> prefix], $key);
+        return $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> has($key);
     }
 
 
@@ -124,7 +127,7 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @return void
      */
     public function remove($key): void {
-        $this -> getTranslator(gettype($key)) -> remove(static::$data[$this -> prefix], $key);
+        $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> remove($key);
     }
 
 
@@ -133,6 +136,7 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @param mixed $key
      * @param mixed $default A default value which will be returned if the key is not found
      * @return mixed
+     * @throws InvalidArgumentException
      */
     public function get($key, $default = null) {
 
@@ -140,7 +144,7 @@ abstract class ContainerAbstract implements ContainerInterface {
             throw new InvalidArgumentException(sprintf('Argument 1 passed to %s::%s() must be of the type string, float, integer or array, %s given', $this -> prefix, __FUNCTION__, gettype($key)));
         }
 
-        return $this -> getTranslator(gettype($key)) -> get(static::$data[$this -> prefix], $key, $default = null);
+        return $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> get($key, $default = null);
     }
 
 
@@ -151,7 +155,7 @@ abstract class ContainerAbstract implements ContainerInterface {
      * @return mixed
      */
     public function pull($key, $default = null) {
-        return $this -> getTranslator(gettype($key)) -> get(static::$data[$this -> prefix], $key, $default = null);
+        return $this -> getTranslator(gettype($key), static::$data[$this -> prefix]) -> get($key, $default = null);
     }
 
 
@@ -167,16 +171,18 @@ abstract class ContainerAbstract implements ContainerInterface {
     /**
      * Returns an array translator
      * @param string $type A different type of translator will be returned depending on the given type (string, integer, float and array)
+     * @param array $data
      * @return mixed
+     * @throws InvalidArgumentException
      */
-    private function getTranslator(string $type) {
+    private function getTranslator(string $type, array &$data) {
 
         switch($type) {
 
             case 'string' :
             case 'integer' :
-            case 'float' : return $this -> getStringTranslator(); break;
-            case 'array' : return $this -> getArrayTranslator(); break;
+            case 'float' : return $this -> getStringTranslator($data); break;
+            case 'array' : return $this -> getArrayTranslator($data); break;
         }
 
         throw new InvalidArgumentException(sprintf('Argument 1 passed to %s::%s() must be of the type string, float, integer or array, %s given', $this -> prefix, __FUNCTION__, gettype($type)));
@@ -185,28 +191,30 @@ abstract class ContainerAbstract implements ContainerInterface {
 
     /**
      * Returns an instance of StringTranslator
+     * @param array $data
      * @return StringTranslator
      */
-    private function getStringTranslator(): StringTranslator {
+    private function getStringTranslator(array &$data): StringTranslator {
 
-        if(false === isset(static::$translators['string'])) {
-            static::$translators['string'] = new StringTranslator();
+        if(false === isset(static::$translators['string'][$this -> prefix])) {
+            static::$translators['string'][$this -> prefix] = new StringTranslator($data);
         }
 
-        return static::$translators['string'];
+        return static::$translators['string'][$this -> prefix];
     }
 
 
     /**
      * Returns an instance of ArrayTranslator
+     * @param array $data
      * @return ArrayTranslator
      */
-    private function getArrayTranslator(): ArrayTranslator {
+    private function getArrayTranslator(array &$data): ArrayTranslator {
 
-        if(false === isset(static::$translators['array'])) {
-            static::$translators['array'] = new ArrayTranslator();
+        if(false === isset(static::$translators['array'][$this -> prefix])) {
+            static::$translators['array'][$this -> prefix] = new ArrayTranslator($data);
         }
 
-        return static::$translators['array'];
+        return static::$translators['array'][$this -> prefix];
     }
 }

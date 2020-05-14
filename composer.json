@@ -1,8 +1,10 @@
 {
     "name": "sfire-framework/sfire-store",
-    "description": "Singleton containers for storing arbitrary data keeping the state until the end of the run.",
+    "description": "Singleton containers for storing and retrieving arbitrary data keeping the state until the end of the run.",
+    "homepage": "https://sfire.io",
     "keywords": [
         "sfire",
+        "framework",
         "container",
         "state",
         "store",
@@ -16,7 +18,8 @@
         }
     ],
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "sfire-framework/sfire-datacontrol": ">=1.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8"
