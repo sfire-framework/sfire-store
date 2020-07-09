@@ -65,7 +65,7 @@ abstract class ContainerAbstract implements ContainerInterface {
 
 
     /**
-     * Returns an instance of the child class
+     * Returns instance of self
      * @return self
      */
     public static function getInstance(): self {
